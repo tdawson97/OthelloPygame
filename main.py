@@ -1,4 +1,5 @@
 import pygame, sys
+import math
 from settings import *
 from tile import Tile
 
@@ -30,10 +31,14 @@ class Game:
     ----------
     setup_game_board():
         sets up the initial game board
+    change_piece():
+        change a piece on the tile
     find_available_positions():
         outlines all available positions for the active player
     check_direction():
         checks each direction from a specified piece
+    make_move():
+        makes a move for the player at a player-selected valid position
     run():
         keeps window open and updated until player exits
     """
@@ -75,9 +80,19 @@ class Game:
                     tile = Tile(WHITE, (i + 1, row_index + 1), (x, y))
                     self.white_pieces.append(tile)
                 tile.draw_piece()
-                self.screen.blit(tile.surface, (x, y))
                 hold_pieces.append(tile)
+                self.screen.blit(tile.surface, tile.pixel_pos)
             self.pieces.append(hold_pieces)
+
+    def change_piece(self, tile, color):
+        """
+        Changes the piece displayed on a tile.
+        :param tile: the tile the piece is on
+        :param color: the color to change the piece to
+        """
+        tile.set_color(color)
+        tile.draw_piece()
+        self.screen.blit(tile.surface, tile.pixel_pos)
 
     def find_available_positions(self):
         """
@@ -89,6 +104,7 @@ class Game:
         else:
             pieces_list = self.white_pieces
 
+        self.available_positions = []
         for piece in pieces_list:
             for direction in possible_moves.values():
                 self.check_direction(piece, direction)
@@ -102,41 +118,95 @@ class Game:
         Checks each direction from a piece, updates self.available_positions, opponent_pieces_jumped
         :param piece: the tile piece to check around
         :param direction: the tuple representing which direction to check
-
+        :returns: None, opponent_pieces_jumped
         """
         opponent_pieces_jumped = []
         list_pos = (piece.coord_pos[1] - 1 + direction[1])
         item_pos = (piece.coord_pos[0] - 1 + direction[0])
 
         # check if outside of game board
-        if list_pos not in range(0, 7) or item_pos not in range(0, 7):
+        if list_pos not in range(0, 8) or item_pos not in range(0, 8):
             return
 
         check_position = self.pieces[list_pos][item_pos]
 
         # continue checking in the same direction if check position is opponents
-        # could also try 'while check_position is in (opponent pieces) <--some variable ?
+
         while check_position.color == self.inactive_player:
             list_pos = (check_position.coord_pos[1] - 1 + direction[1])
             item_pos = (check_position.coord_pos[0] - 1 + direction[0])
             opponent_pieces_jumped.append(check_position)
 
-            if list_pos not in range(0, 7) or item_pos not in range(0, 7):
+            if list_pos not in range(0, 8) or item_pos not in range(0, 8):
                 return
 
             check_position = self.pieces[list_pos][item_pos]
 
         if check_position.color == GREY and len(opponent_pieces_jumped) > 0:
-            self.available_positions.append(check_position)
+            if check_position not in self.available_positions:
+                self.available_positions.append(check_position)
+                return
             return
+
+        elif check_position.color == self.active_player:
+            return opponent_pieces_jumped
+        return
+
+    def make_move(self, mouse_position):
+        """
+        Places player piece at mouse clicked position, updates other pieces according to rules of the game.
+        Empties self.available_positions list and swaps active player at the end.
+        :param mouse_position: (x,y) position of mouse click
+        :returns: None
+        """
+        # find coord_pos to index into selected tile
+        x = math.floor(mouse_position[0] // 100)
+        y = math.floor(mouse_position[1] // 100)
+        tile = self.pieces[y-1][x-1]
+
+        if self.active_player == WHITE:
+            player_pieces = self.white_pieces
+            opponent_pieces = self.black_pieces
+        else:
+            player_pieces = self.black_pieces
+            opponent_pieces = self.white_pieces
+
+        # check if tile is an available spot, update piece, return if not
+        if tile in self.available_positions:
+            self.available_positions.remove(tile)
+            self.change_piece(tile, self.active_player)
+            player_pieces.append(tile)
+        else:
+            return
+
+        # check each direction from new piece, update others surrounding if needed
+        for direction in possible_moves.values():
+            switch_tiles = self.check_direction(tile, direction)
+            if switch_tiles is not None:
+                for piece in switch_tiles:
+                    self.change_piece(piece, self.active_player)
+                    player_pieces.append(piece)
+                    opponent_pieces.remove(piece)
+
+        # remove outline
+        for tile in self.available_positions:
+            self.change_piece(tile, GREY)
+
+        # swap players
+        self.available_positions = []
+        self.active_player, self.inactive_player = self.inactive_player, self.active_player
 
     def run(self):
         self.setup_game_board()
+
         while True:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     pygame.quit()
                     sys.exit()
+                elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+                    mouse_position = pygame.mouse.get_pos()
+                    self.make_move(mouse_position)
                 self.find_available_positions()
             pygame.display.update()
 

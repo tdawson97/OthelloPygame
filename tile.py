@@ -13,12 +13,15 @@ class Tile:
     surface: Surface
         to draw circle piece on Tile object
     coord_pos: tuple
-        to represent the coordinate position of the tile
+        to represent the coordinate position of the tile on the board
     pixel_pos: tuple
-        to represent the position on the screen of the tile
+        to represent the position of the tile on the screen
 
     Methods
     ----------
+    set_color():
+        Set color of the piece
+
     draw_piece():
         Draw the circular piece on the Tile object
 
@@ -34,6 +37,10 @@ class Tile:
         self.coord_pos = coord_pos
         self.pixel_pos = pixel_pos
 
+
+    def set_color(self, color):
+        self.color = color
+
     def draw_piece(self):
         """
         Draws the piece onto the Tile object
@@ -42,3 +49,4 @@ class Tile:
 
     def draw_outline(self, color=RED, width=5):
         pygame.draw.circle(self.surface, color, center, radius, width)
+
