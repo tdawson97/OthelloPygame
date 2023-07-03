@@ -42,3 +42,11 @@ possible_moves = {
                     'bottom_right': (1, 1)}
 
 font = 'PlayfairDisplay-Regular.otf'
+
+player_colors = {"BLACK": (0, 0, 0),
+                 "WHITE": (255, 255, 255),
+                 "PURPLE": (127, 0, 255),
+                 "BLUE": (0, 128, 255),
+                 "YELLOW": (255, 255, 0),
+                 "ORANGE": (255, 128, 0),
+                 }

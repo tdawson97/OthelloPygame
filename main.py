@@ -55,14 +55,15 @@ class Game:
         pygame.display.set_caption('Othello')
         self.pieces = []
 
-        self.active_player = WHITE
-        self.inactive_player = BLACK
+
         self.available_positions = []
         self.black_pieces = []
         self.white_pieces = []
 
-        self.player_1 = Player("Player 1", WHITE)
+        self.player_1 = Player("Player 1", WHITE, True)
         self.player_2 = Player("Player 2", BLACK)
+
+
 
         self.ui = UI()
         self.paused = False
@@ -131,21 +132,23 @@ class Game:
         Outlines in red the pieces that the active player can make a valid move on.
         Calls the check direction method for validation of move.
         """
-        if self.active_player == BLACK:
-            pieces_list = self.player_2.pieces
+        if self.player_1.active:
+            active_player = self.player_1
+            opponent = self.player_2
         else:
-            pieces_list = self.player_1.pieces
+            active_player = self.player_2
+            opponent = self.player_1
 
         self.available_positions = []
-        for piece in pieces_list:
+        for piece in active_player.pieces:
             for direction in possible_moves.values():
-                self.check_direction(piece, direction)
+                self.check_direction(piece, direction, active_player, opponent)
 
         if not self.available_positions:
             self.declare_winner()
 
 
-    def check_direction(self, piece, direction):
+    def check_direction(self, piece, direction, active_player, opponent):
         """
         Checks each direction from a piece, updates self.available_positions, opponent_pieces_jumped
         :param piece: the tile piece to check around
@@ -164,7 +167,7 @@ class Game:
 
         # continue checking in the same direction if check_position is opponent's piece
 
-        while check_position.color == self.inactive_player:
+        while check_position in opponent.pieces:
             list_pos = (check_position.coord_pos[1] - 1 + direction[1])
             item_pos = (check_position.coord_pos[0] - 1 + direction[0])
             opponent_pieces_jumped.append(check_position)
@@ -180,7 +183,7 @@ class Game:
                 return
             return
 
-        elif check_position.color == self.active_player:
+        elif check_position in active_player.pieces:
             return opponent_pieces_jumped
         return
 
@@ -196,29 +199,29 @@ class Game:
         y = math.floor(mouse_position[1] // 100)
         tile = self.pieces[y-1][x-1]
 
-        if self.active_player == WHITE:
-            player_pieces = self.player_1.pieces
-            opponent_pieces = self.player_2.pieces
+        if self.player_1.active:
+            active_player = self.player_1
+            opponent = self.player_2
         else:
-            player_pieces = self.player_2.pieces
-            opponent_pieces = self.player_1.pieces
+            active_player = self.player_2
+            opponent = self.player_1
 
         # check if tile is an available spot, update piece, return if not
         if tile in self.available_positions:
             self.available_positions.remove(tile)
-            self.change_piece(tile, self.active_player)
-            player_pieces.append(tile)
+            self.change_piece(tile, active_player.color)
+            active_player.pieces.append(tile)
         else:
             return
 
         # check each direction from new piece, update others surrounding if needed
         for direction in possible_moves.values():
-            switch_tiles = self.check_direction(tile, direction)
+            switch_tiles = self.check_direction(tile, direction, active_player, opponent)
             if switch_tiles is not None:
                 for piece in switch_tiles:
-                    self.change_piece(piece, self.active_player)
-                    player_pieces.append(piece)
-                    opponent_pieces.remove(piece)
+                    self.change_piece(piece, active_player.color)
+                    active_player.pieces.append(piece)
+                    opponent.pieces.remove(piece)
 
         # remove outline
         for tile in self.available_positions:
@@ -226,7 +229,8 @@ class Game:
 
         # swap players
         self.available_positions = []
-        self.active_player, self.inactive_player = self.inactive_player, self.active_player
+        active_player.switch_turns()
+        opponent.switch_turns()
 
     def declare_winner(self):
         if len(self.player_1.pieces) > len(self.player_2.pieces):
@@ -243,18 +247,21 @@ class Game:
                 if event.type == pygame.QUIT:
                     pygame.quit()
                     sys.exit()
-                elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
-                    mouse_position = pygame.mouse.get_pos()
-                    self.make_move(mouse_position)
-                elif event.type == pygame.KEYDOWN and event.key == pygame.K_q:
+                if event.type == pygame.KEYDOWN and event.key == pygame.K_q:
                     self.paused = not self.paused
-            if self.paused is True:
-                self.ui.display_options_screen()
-            else:
-                self.update_game_board()
+                if self.paused is False:
+                    if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+                        mouse_position = pygame.mouse.get_pos()
+                        self.make_move(mouse_position)
+                    self.update_game_board()
+                else:
+                    self.ui.display_options_screen(self.player_1, self.player_2)
+                    if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+                        mouse_position = pygame.mouse.get_pos()
+                        self.ui.change_player_color(mouse_position)
 
-            if self.available_positions:
-                self.ui.show_scores(len(self.player_1.pieces), len(self.player_2.pieces))
+                if self.available_positions:
+                    self.ui.show_scores(self.player_1, self.player_2)
 
             pygame.display.update()
 
