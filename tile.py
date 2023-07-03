@@ -28,7 +28,7 @@ class Tile:
     draw_outline():
         Draw an outline over a piece on the board
     """
-    def __init__(self, color, coord_pos, pixel_pos):
+    def __init__(self, color=None, coord_pos=None, pixel_pos=None):
         """
         Constructs all the necessary attributes for a Tile object
         """

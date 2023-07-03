@@ -40,3 +40,5 @@ possible_moves = {
                     'upper_right': (1, -1),
                     'bottom_left': (-1, 1),
                     'bottom_right': (1, 1)}
+
+font = 'PlayfairDisplay-Regular.otf'
