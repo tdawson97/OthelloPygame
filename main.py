@@ -19,31 +19,16 @@ class Game:
         The border separating the board from the edge of the screen
     pieces : list of lists
         contains all tile objects, formatted the same as board in settings.py
-    active_player : tuple
-        the color code of the player that has the next move
-    inactive_player : tuple
-        the color code of the player that is waiting for their turn
     available_positions : list
         the available tiles to move on for the player that has the next move
-    black_pieces : list
-        all the black player's pieces on the board
-    white_pieces : list
-        all the white player's pieces on the board
-
-    Methods
-    ----------
-    setup_game_board():
-        sets up the initial game board
-    change_piece():
-        change a piece on the tile
-    find_available_positions():
-        outlines all available positions for the active player
-    check_direction():
-        checks each direction from a specified piece
-    make_move():
-        makes a move for the player at a player-selected valid position
-    run():
-        keeps window open and updated until player exits
+    player_1 : Player object
+        represents player 1
+    player_2 : Player object
+        represents player 2
+    ui : UI object
+        sets up the options screen
+    paused: boolean
+        to determine if game board is active
     """
     def __init__(self):
         """
@@ -54,17 +39,9 @@ class Game:
         self.border = pygame.Rect(0, 0, WIDTH, HEIGHT)
         pygame.display.set_caption('Othello')
         self.pieces = []
-
-
         self.available_positions = []
-        self.black_pieces = []
-        self.white_pieces = []
-
         self.player_1 = Player("Player 1", WHITE, True)
         self.player_2 = Player("Player 2", BLACK)
-
-
-
         self.ui = UI()
         self.paused = False
 
@@ -98,8 +75,10 @@ class Game:
             piece.draw_outline()
             self.screen.blit(piece.surface, piece.pixel_pos)
 
-
     def update_game_board(self):
+        """
+        Continually updates the screen
+        """
         self.screen.fill(GREEN)
         pygame.draw.rect(self.screen, BROWN, self.border, 90, 100)
 
@@ -113,8 +92,6 @@ class Game:
             piece.draw_outline()
             self.screen.blit(piece.surface, piece.pixel_pos)
 
-
-
     def change_piece(self, tile, color):
         """
         Changes the piece displayed on a tile.
@@ -124,8 +101,6 @@ class Game:
         tile.set_color(color)
         tile.draw_piece()
         self.screen.blit(tile.surface, tile.pixel_pos)
-
-
 
     def find_available_positions(self):
         """
@@ -146,7 +121,6 @@ class Game:
 
         if not self.available_positions:
             self.declare_winner()
-
 
     def check_direction(self, piece, direction, active_player, opponent):
         """
@@ -189,8 +163,8 @@ class Game:
 
     def make_move(self, mouse_position):
         """
-        Places player piece at mouse clicked position, updates other pieces according to rules of the game.
-        Empties self.available_positions list and swaps active player at the end.
+        Places player piece at mouse clicked position, updates other pieces.
+        Empties available_positions list and swaps active player at the end.
         :param mouse_position: (x,y) position of mouse click
         :returns: None
         """
@@ -233,6 +207,9 @@ class Game:
         opponent.switch_turns()
 
     def declare_winner(self):
+        """
+        declares the winner of the game
+        """
         if len(self.player_1.pieces) > len(self.player_2.pieces):
             self.ui.show_winner_text(self.player_1)
         elif len(self.player_2.pieces) > len(self.player_1.pieces):
@@ -259,10 +236,8 @@ class Game:
                     if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                         mouse_position = pygame.mouse.get_pos()
                         self.ui.change_player_color(mouse_position)
-
                 if self.available_positions:
                     self.ui.show_scores(self.player_1, self.player_2)
-
             pygame.display.update()
 
 

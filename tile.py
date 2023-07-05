@@ -16,17 +16,6 @@ class Tile:
         to represent the coordinate position of the tile on the board
     pixel_pos: tuple
         to represent the position of the tile on the screen
-
-    Methods
-    ----------
-    set_color():
-        Set color of the piece
-
-    draw_piece():
-        Draw the circular piece on the Tile object
-
-    draw_outline():
-        Draw an outline over a piece on the board
     """
     def __init__(self, color=None, coord_pos=None, pixel_pos=None):
         """
@@ -36,7 +25,6 @@ class Tile:
         self.surface = pygame.Surface((TILE_WIDTH, TILE_HEIGHT), pygame.SRCALPHA)
         self.coord_pos = coord_pos
         self.pixel_pos = pixel_pos
-
 
     def set_color(self, color):
         self.color = color
