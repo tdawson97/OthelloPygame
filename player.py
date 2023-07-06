@@ -1,6 +1,7 @@
 import pygame
 from settings import *
 
+
 class Player:
     """
     Represents the players in the game
@@ -20,6 +21,7 @@ class Player:
         self.color = color
         self.pieces = []
         self.active = status
+
 
     def set_color(self, color):
         self.color = color

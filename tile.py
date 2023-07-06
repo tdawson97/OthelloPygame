@@ -35,6 +35,6 @@ class Tile:
         """
         pygame.draw.circle(self.surface, self.color, center, radius)
 
-    def draw_outline(self, color=RED, width=5):
+    def draw_outline(self, color, width=5):
         pygame.draw.circle(self.surface, color, center, radius, width)
 

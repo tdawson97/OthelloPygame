@@ -44,14 +44,13 @@ class Game:
         self.player_2 = Player("Player 2", BLACK)
         self.ui = UI()
         self.paused = False
+        self.game_over = False
 
     def setup_game_board(self):
         """
-        Communicates with tile.py to create Tile objects and draw pieces
-        on the board.
+        Communicates with tile.py to create Tile objects and store in
+        self.pieces
         """
-        self.screen.fill(GREEN)
-        pygame.draw.rect(self.screen, BROWN, self.border, 90, 100)
         for row_index, row in enumerate(board):
             hold_pieces = []
             for i in range(8):
@@ -65,31 +64,29 @@ class Game:
                 else:
                     tile = Tile(WHITE, (i + 1, row_index + 1), (x, y))
                     self.player_1.pieces.append(tile)
-                tile.draw_piece()
                 hold_pieces.append(tile)
-                self.screen.blit(tile.surface, tile.pixel_pos)
             self.pieces.append(hold_pieces)
-
-        self.find_available_positions()
-        for piece in self.available_positions:
-            piece.draw_outline()
-            self.screen.blit(piece.surface, piece.pixel_pos)
 
     def update_game_board(self):
         """
         Continually updates the screen
         """
-        self.screen.fill(GREEN)
-        pygame.draw.rect(self.screen, BROWN, self.border, 90, 100)
+        if self.game_over is False:
+            self.screen.fill(GREEN)
+            pygame.draw.rect(self.screen, BROWN, self.border, 90, 100)
 
         for tile in self.pieces:
             for i in range(8):
                 tile[i].draw_piece()
                 self.screen.blit(tile[i].surface, tile[i].pixel_pos)
 
-        self.find_available_positions()
+        if self.player_1.active:
+            active_player = self.player_1
+        else:
+            active_player = self.player_2
+
         for piece in self.available_positions:
-            piece.draw_outline()
+            piece.draw_outline(active_player.color)
             self.screen.blit(piece.surface, piece.pixel_pos)
 
     def change_piece(self, tile, color):
@@ -108,11 +105,9 @@ class Game:
         Calls the check direction method for validation of move.
         """
         if self.player_1.active:
-            active_player = self.player_1
-            opponent = self.player_2
+            active_player, opponent = self.player_1, self.player_2
         else:
-            active_player = self.player_2
-            opponent = self.player_1
+            active_player, opponent = self.player_2, self.player_1
 
         self.available_positions = []
         for piece in active_player.pieces:
@@ -120,7 +115,15 @@ class Game:
                 self.check_direction(piece, direction, active_player, opponent)
 
         if not self.available_positions:
-            self.declare_winner()
+            self.player_1.switch_turns()
+            self.player_2.switch_turns()
+            active_player, opponent = opponent, active_player
+            for piece in active_player.pieces:
+                for direction in possible_moves.values():
+                    self.check_direction(piece, direction, active_player,
+                                         opponent)
+            if not self.available_positions:
+                self.declare_winner()
 
     def check_direction(self, piece, direction, active_player, opponent):
         """
@@ -174,11 +177,9 @@ class Game:
         tile = self.pieces[y-1][x-1]
 
         if self.player_1.active:
-            active_player = self.player_1
-            opponent = self.player_2
+            active_player, opponent = self.player_1, self.player_2
         else:
-            active_player = self.player_2
-            opponent = self.player_1
+            active_player, opponent = self.player_2, self.player_1
 
         # check if tile is an available spot, update piece, return if not
         if tile in self.available_positions:
@@ -206,25 +207,30 @@ class Game:
         active_player.switch_turns()
         opponent.switch_turns()
 
+        self.find_available_positions()
+
     def declare_winner(self):
         """
         declares the winner of the game
         """
+        pygame.draw.rect(self.screen, BROWN, self.border, 90, 100)
         if len(self.player_1.pieces) > len(self.player_2.pieces):
             self.ui.show_winner_text(self.player_1)
         elif len(self.player_2.pieces) > len(self.player_1.pieces):
             self.ui.show_winner_text(self.player_2)
         else:
             self.ui.show_winner_text()
+        self.game_over = True
 
     def run(self):
         self.setup_game_board()
+        self.find_available_positions()
         while True:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     pygame.quit()
                     sys.exit()
-                if event.type == pygame.KEYDOWN and event.key == pygame.K_q:
+                elif event.type == pygame.KEYDOWN and event.key == pygame.K_q and self.game_over is False:
                     self.paused = not self.paused
                 if self.paused is False:
                     if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
@@ -236,7 +242,7 @@ class Game:
                     if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                         mouse_position = pygame.mouse.get_pos()
                         self.ui.change_player_color(mouse_position)
-                if self.available_positions:
+                if self.available_positions and self.game_over is False:
                     self.ui.show_scores(self.player_1, self.player_2)
             pygame.display.update()
 

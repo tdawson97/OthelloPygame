@@ -62,7 +62,7 @@ class UI:
         else:
             text_surf = self.font.render(f"It's a tie.", False, BLACK)
 
-        text_rect = text_surf.get_rect(topleft=(450, 0))
+        text_rect = text_surf.get_rect(topleft=(350, 0))
         self.display_surface.blit(text_surf, text_rect)
 
     def display_options_screen(self, player_1, player_2):
@@ -101,7 +101,7 @@ class UI:
             pygame.draw.rect(self.options_screen, rgb_value, color_rect)
             if rgb_value == player.color:
                 pygame.draw.rect(self.options_screen, GREEN, pygame.Rect(pos[0], pos[1], 50, 50), 5)
-            pos = (pos[0]+100, pos[1])
+            pos = (pos[0]+80, pos[1])
 
     def change_player_color(self, pos):
         """
