@@ -15,7 +15,12 @@ If no player has any valid moves, the game is over and thus, a winner will be cr
 
 At any time, players also have the option the change the colors of their pieces through the options menu.  
 
-
-![screenshot](SCREENSHOTS/Start_Game.png)  
 ## How to Run
 Install Python and the Pygame library. Download all the files and run the main.py program in an IDE to begin the game.
+
+## Screenshots
+![screenshot](SCREENSHOTS/Start_Game.png)  
+![screenshot](SCREENSHOTS/Move_1.png)  
+![screenshot](SCREENSHOTS/Mid_Game.png)  
+![screenshot](SCREENSHOTS/End_Game.png) 
+![screenshot](SCREENSHOTS/Options.png)  
