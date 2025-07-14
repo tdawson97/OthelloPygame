@@ -49,7 +49,11 @@ class UI:
         self.display_surface.blit(text_surf, text_rect)
 
         text_surf = self.options_font.render(f'Press q to view options', False, BLACK)
-        text_rect = text_surf.get_rect(topleft=(345, 925))
+        text_rect = text_surf.get_rect(topleft=(100, 925))
+        self.display_surface.blit(text_surf, text_rect)
+
+        text_surf = self.options_font.render(f'Press r to reset', False, BLACK)
+        text_rect = text_surf.get_rect(topleft=(700, 925))
         self.display_surface.blit(text_surf, text_rect)
 
     def show_winner_text(self, winner=None):

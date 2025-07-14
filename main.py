@@ -45,6 +45,7 @@ class Game:
         self.ui = UI()
         self.paused = False
         self.game_over = False
+        self.play = True
 
     def setup_game_board(self):
         """
@@ -222,16 +223,34 @@ class Game:
             self.ui.show_winner_text()
         self.game_over = True
 
+    def reset(self):
+        """
+        resets default values to restart game
+        """
+        self.screen = pygame.display.set_mode((WIDTH, HEIGHT))
+        self.border = pygame.Rect(0, 0, WIDTH, HEIGHT)
+        self.pieces = []
+        self.available_positions = []
+        self.player_1 = Player("Player 1", WHITE, True)
+        self.player_2 = Player("Player 2", BLACK)
+        self.ui = UI()
+        self.paused = False
+        self.game_over = False
+        self.play = True
+        self.run()
+
     def run(self):
         self.setup_game_board()
         self.find_available_positions()
-        while True:
+        while self.play:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     pygame.quit()
                     sys.exit()
                 elif event.type == pygame.KEYDOWN and event.key == pygame.K_q and self.game_over is False:
                     self.paused = not self.paused
+                elif event.type == pygame.KEYDOWN and event.key == pygame.K_r:
+                    self.reset()
                 if self.paused is False:
                     if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                         mouse_position = pygame.mouse.get_pos()
