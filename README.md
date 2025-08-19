@@ -1,26 +1,61 @@
-# Othello in Python
-## How to Play
-Two players take turns placing their pieces on an 8x8 game board. At the start, 4 pieces are placed in the middle of the board.  
+# OthelloPygame
 
-Current pieces on the board are filled in with the players' colors while empty spaces are grey. Each piece that is placed by a player must be placed horizontally, vertically, or diagonally from one of their existing pieces, and must have at least one
-of their opponents pieces between them. The available spaces for the next move will be circled with the color of the player that will make the move.
+A two-player Othello (Reversi) game built with Python and Pygame.
 
-When a piece has been placed, all the opponents pieces that were between the new piece and any of the player's existing pieces will flip to the
-player's color.  
+## Features
 
-This will conclude their turn. This will go back and forth. If one player has no more valid moves to make, they forfeit their
-turn.
+- Classic Othello rules, playable locally by two players.
+- Players can select and customize the color of their tiles.
+- Intuitive GUI powered by Pygame.
+- Visual feedback for valid moves, score, and end-of-game results.
 
-If no player has any valid moves, the game is over and thus, a winner will be crowned.  
+## Installation
 
-At any time, players also have the option the change the colors of their pieces through the options menu.  
+1. **Clone the repository:**
+   ```bash
+   git clone https://github.com/tdawson97/OthelloPygame.git
+   cd OthelloPygame
+   ```
 
-## How to Run
-Install Python and the Pygame library. Download all the files and run the main.py program in an IDE to begin the game.
+2. **Install dependencies:**
+   - Requires Python 3.x
+   - Install Pygame:
+     ```bash
+     pip install pygame
+     ```
+
+## Running the Game
+
+Run the main script:
+```bash
+python main.py
+```
 
 ## Screenshots
-![screenshot](SCREENSHOTS/Start_Game.png)  
-![screenshot](SCREENSHOTS/Move_1.png)  
-![screenshot](SCREENSHOTS/Mid_Game.png)  
-![screenshot](SCREENSHOTS/End_Game.png) 
-![screenshot](SCREENSHOTS/Options.png)  
+
+| Start Screen | Game Options | Making Moves | Mid Game | End Game |
+|---|---|---|---|---|
+| ![Start_Game](SCREENSHOTS/Start_Game.png) | ![Options](SCREENSHOTS/Options.png) | ![Move_1](SCREENSHOTS/Move_1.png) | ![Mid_Game](SCREENSHOTS/Mid_Game.png) | ![End_Game](SCREENSHOTS/End_Game.png) |
+
+## How to Play
+
+- Take turns placing tiles on the board.
+- Flank your opponent’s tiles horizontally, vertically, or diagonally to flip them to your color.
+- The player with the most tiles at the end wins!
+
+## Project Structure
+
+- `main.py`: Entry point and game loop.
+- `player.py`: Player configuration and logic.
+- `tile.py`: Tile and board mechanics.
+- `ui.py`: User interface and rendering.
+- `settings.py`: Game settings.
+- `SCREENSHOTS/`: Sample images of gameplay.
+
+## Credits
+
+Created by [tdawson97](https://github.com/tdawson97).
+
+---
+
+Enjoy playing Othello with this customizable, easy-to-run game!
